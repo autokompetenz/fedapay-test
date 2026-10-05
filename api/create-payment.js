@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        description: `Paiement de ${amount} XOF`,
+        description: `Collecte pour Marlet Djenontin - ${amount} XOF`,
         amount: Number(amount),
         currency: { iso: 'XOF' },
         callback_url: 'https://fedapay-test.vercel.app/api/webhook',
