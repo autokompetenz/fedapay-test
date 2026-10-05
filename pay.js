@@ -10,7 +10,7 @@ try {
 } catch {}
 
 const KEY = process.env.FEDAPAY_SECRET_KEY;
-const BASE = process.env.FEDAPAY_BASE_URL ?? 'https://sandbox-api.fedapay.com/v1';
+const BASE = process.env.FEDAPAY_BASE_URL ?? 'https://api.fedapay.com/v1';
 
 if (!KEY || KEY.includes('xxxx')) {
   console.error('❌ Mets ta clé secrète sandbox dans .env (copie .env.example)');
