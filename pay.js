@@ -44,7 +44,7 @@ if (!tx.v1 || !tx.v1.id) {
   console.error('❌ Échec création transaction:', tx);
   process.exit(1);
 }
-const id = tx.v1.id;
+const id = tx?.v1?.id ?? tx?.["v1/transaction"]?.id;
 console.log('✅ Transaction créée, id =', id, '| statut:', tx.v1.status);
 
 // 2) Générer le token → URL de checkout

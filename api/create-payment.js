@@ -29,13 +29,19 @@ export default async function handler(req, res) {
       }),
     });
     const tx = await txRes.json();
-    const id = tx?.v1?.id;
+    const data = tx?.v1 ?? tx?.['v1/transaction'];
+    const id = data?.id;
     if (!id) return res.status(500).json({ error: 'Création transaction échouée', details: tx });
 
-    const tokenRes = await fetch(`${BASE}/transactions/${id}/token`, { method: 'POST', headers });
-    const token = await tokenRes.json();
+    // L'URL de paiement peut être dans la transaction ou via /token
+    let url = data.payment_url;
+    if (!url) {
+      const tokenRes = await fetch(`${BASE}/transactions/${id}/token`, { method: 'POST', headers });
+      const token = await tokenRes.json();
+      url = token.url;
+    }
 
-    res.status(200).json({ url: token.url, transactionId: id });
+    res.status(200).json({ url, transactionId: id });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
