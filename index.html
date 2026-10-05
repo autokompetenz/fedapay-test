@@ -67,9 +67,24 @@
       if (json.url) {
         window.location.href = json.url; // page de paiement FedaPay
       } else if (json.message) {
-        document.getElementById('msg').style.color = '#16a34a';
-        document.getElementById('msg').textContent = json.message;
-        btn.disabled = false; btn.textContent = 'Payer';
+        const msg = document.getElementById('msg');
+        msg.style.color = '#16a34a';
+        msg.textContent = json.message;
+        // Surveille le statut et affiche un message clair au client
+        if (json.transactionId) {
+          const poll = setInterval(async () => {
+            try {
+              const s = await (await fetch(`/api/status?id=${json.transactionId}`)).json();
+              msg.textContent = s.message;
+              if (s.status === 'approved' || s.status === 'canceled' || s.status === 'declined' || s.status === 'transferred') {
+                clearInterval(poll);
+                msg.style.color = s.status === 'approved' ? '#16a34a' : '#b91c1c';
+                btn.disabled = false; btn.textContent = 'Payer';
+              }
+            } catch {}
+          }, 4000);
+          setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = 'Payer'; }, 90000);
+        }
       } else {
         document.getElementById('msg').textContent = json.error || 'Erreur';
         btn.disabled = false; btn.textContent = 'Payer';
