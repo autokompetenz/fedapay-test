@@ -57,13 +57,12 @@
   <div id="modal" class="modal">
     <div class="modal-box">
       <p id="modalText"></p>
-      <button id="modalClose" type="button">OK</button>
     </div>
   </div>
   <script>
     const modal = document.getElementById('modal');
     const modalText = document.getElementById('modalText');
-    document.getElementById('modalClose').onclick = () => modal.classList.remove('show');
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
     function showModal(text) { modalText.textContent = text; modal.classList.add('show'); }
     const form = document.getElementById('form');
     form.addEventListener('submit', async (e) => {
