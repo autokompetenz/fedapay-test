@@ -33,24 +33,29 @@ export default async function handler(req, res) {
     const id = data?.id;
     if (!id) return res.status(500).json({ error: 'Création transaction échouée', details: tx });
 
-    // Mode MTN ou Moov demandé : on déclenche directement le paiement mobile money
+    // Mode MTN ou Moov demandé : paiement mobile money sans redirection
     if (mode === 'mtn' || mode === 'moov') {
-      const payRes = await fetch(`${BASE}/transactions/${id}/payment`, {
+      const method = mode === 'mtn' ? 'mtn_open' : 'moov';
+      // token de paiement (déjà dans la transaction, sinon on le génère)
+      let payToken = data.payment_token || tx?.v1?.payment_token;
+      if (!payToken) {
+        const tokenRes = await fetch(`${BASE}/transactions/${id}/token`, { method: 'POST', headers });
+        const tokenJson = await tokenRes.json();
+        payToken = tokenJson.token ?? tokenJson?.v1?.token;
+      }
+      const payRes = await fetch(`${BASE}/${method}`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          mode,
-          phone_number: { number: (phone || '97000000').replace(/\s/g, ''), country: 'bj' },
-        }),
+        body: JSON.stringify({ token: payToken }),
       });
-      const payment = await payRes.json();
+      const payment = await payRes.json().catch(() => null);
       if (!payRes.ok) {
         return res.status(400).json({ error: 'Paiement mobile money échoué', details: payment });
       }
       return res.status(200).json({
         status: 'pending',
         transactionId: id,
-        message: `Demande envoyée au ${phone}. Confirme le paiement ${mode.toUpperCase()} Mobile Money sur ton téléphone.`,
+        message: `Demande envoyée. Confirme le paiement ${mode.toUpperCase()} Mobile Money sur ton téléphone avec ton code PIN.`,
         details: payment,
       });
     }
