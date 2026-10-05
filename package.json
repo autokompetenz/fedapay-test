@@ -1,0 +1,9 @@
+{
+  "name": "fedapay-test",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "pay": "node index.js",
+    "webhook": "node webhook.js"
+  }
+}
