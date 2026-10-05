@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "pay": "node index.js",
+    "pay": "node pay.js",
     "webhook": "node webhook.js"
   }
 }

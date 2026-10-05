@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>FedaPay Test</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 60px auto; padding: 0 20px; line-height: 1.6; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; }
+    .ok { color: #16a34a; }
+  </style>
+</head>
+<body>
+  <h1>💳 FedaPay Test</h1>
+  <p class="ok">✅ Le site est en ligne.</p>
+  <h2>Endpoints disponibles</h2>
+  <ul>
+    <li><code>POST /api/webhook</code> — reçoit les webhooks FedaPay</li>
+  </ul>
+  <h2>Tester le webhook</h2>
+  <pre>curl -X POST https://fedapay-test.vercel.app/api/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"name":"transaction.approved"}'</pre>
+  <p>Les transactions se créent en local avec <code>npm run pay</code>.</p>
+</body>
+</html>
