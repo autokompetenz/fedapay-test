@@ -36,7 +36,13 @@
       <input name="email" type="email" value="jean@example.com" required>
       <label>Téléphone</label>
       <input name="phone" value="97000000" required>
-      <button id="btn" type="submit">Payer avec MTN ou Moov</button>
+      <label>Mode de paiement</label>
+      <select name="mode" style="width:100%;padding:12px;margin:6px 0 16px;border:1px solid #ddd;border-radius:8px;">
+        <option value="mtn">MTN Mobile Money</option>
+        <option value="moov">Moov Money</option>
+        <option value="">Autres méthodes (page FedaPay)</option>
+      </select>
+      <button id="btn" type="submit">Payer</button>
     </form>
     <p id="msg"></p>
   </div>
@@ -55,10 +61,14 @@
       });
       const json = await res.json();
       if (json.url) {
-        window.location.href = json.url; // page de paiement FedaPay (choix MTN/Moov)
+        window.location.href = json.url; // page de paiement FedaPay
+      } else if (json.message) {
+        document.getElementById('msg').style.color = '#16a34a';
+        document.getElementById('msg').textContent = json.message;
+        btn.disabled = false; btn.textContent = 'Payer';
       } else {
         document.getElementById('msg').textContent = json.error || 'Erreur';
-        btn.disabled = false; btn.textContent = 'Payer avec MTN ou Moov';
+        btn.disabled = false; btn.textContent = 'Payer';
       }
     });
   </script>

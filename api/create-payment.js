@@ -2,7 +2,7 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST uniquement' });
 
-  const { amount, firstname, lastname, email, phone } = req.body || {};
+  const { amount, firstname, lastname, email, phone, mode } = req.body || {};
   if (!amount || isNaN(amount) || Number(amount) <= 0) {
     return res.status(400).json({ error: 'Montant invalide' });
   }
@@ -33,7 +33,29 @@ export default async function handler(req, res) {
     const id = data?.id;
     if (!id) return res.status(500).json({ error: 'Création transaction échouée', details: tx });
 
-    // L'URL de paiement peut être dans la transaction ou via /token
+    // Mode MTN ou Moov demandé : on déclenche directement le paiement mobile money
+    if (mode === 'mtn' || mode === 'moov') {
+      const payRes = await fetch(`${BASE}/transactions/${id}/payment`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          mode,
+          phone_number: { number: (phone || '97000000').replace(/\s/g, ''), country: 'bj' },
+        }),
+      });
+      const payment = await payRes.json();
+      if (!payRes.ok) {
+        return res.status(400).json({ error: 'Paiement mobile money échoué', details: payment });
+      }
+      return res.status(200).json({
+        status: 'pending',
+        transactionId: id,
+        message: `Demande envoyée au ${phone}. Confirme le paiement ${mode.toUpperCase()} Mobile Money sur ton téléphone.`,
+        details: payment,
+      });
+    }
+
+    // Sinon : page de checkout FedaPay (toutes les méthodes)
     let url = data.payment_url;
     if (!url) {
       const tokenRes = await fetch(`${BASE}/transactions/${id}/token`, { method: 'POST', headers });
