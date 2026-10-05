@@ -2,24 +2,65 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>FedaPay Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Envoyer de l'argent — FedaPay Test</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 60px auto; padding: 0 20px; line-height: 1.6; }
-    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; }
-    .ok { color: #16a34a; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #f5f7fa; margin: 0; padding: 40px 20px; }
+    .card { background: #fff; max-width: 440px; margin: auto; padding: 32px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    h1 { margin-top: 0; font-size: 1.4rem; }
+    label { font-size: .85rem; color: #555; }
+    input { width: 100%; padding: 12px; margin: 6px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
+    button { width: 100%; padding: 14px; background: #16a34a; color: #fff; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+    button:disabled { opacity: .6; }
+    .methods { display: flex; gap: 10px; margin-bottom: 16px; }
+    .methods span { border: 1px solid #eee; padding: 8px 12px; border-radius: 8px; font-size: .85rem; }
+    #msg { margin-top: 16px; color: #b91c1c; }
   </style>
 </head>
 <body>
-  <h1>💳 FedaPay Test</h1>
-  <p class="ok">✅ Le site est en ligne.</p>
-  <h2>Endpoints disponibles</h2>
-  <ul>
-    <li><code>POST /api/webhook</code> — reçoit les webhooks FedaPay</li>
-  </ul>
-  <h2>Tester le webhook</h2>
-  <pre>curl -X POST https://fedapay-test.vercel.app/api/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"name":"transaction.approved"}'</pre>
-  <p>Les transactions se créent en local avec <code>npm run pay</code>.</p>
+  <div class="card">
+    <h1>💸 Envoyer de l'argent</h1>
+    <p>Paiement via <strong>MTN Mobile Money</strong> ou <strong>Moov Money</strong>.</p>
+    <div class="methods">
+      <span>📱 MTN MoMo</span><span>📱 Moov Money</span>
+    </div>
+    <form id="form">
+      <label>Montant (XOF)</label>
+      <input name="amount" type="number" min="100" value="1000" required>
+      <label>Prénom</label>
+      <input name="firstname" value="Jean" required>
+      <label>Nom</label>
+      <input name="lastname" value="Test" required>
+      <label>Email</label>
+      <input name="email" type="email" value="jean@example.com" required>
+      <label>Téléphone</label>
+      <input name="phone" value="97000000" required>
+      <button id="btn" type="submit">Payer avec MTN ou Moov</button>
+    </form>
+    <p id="msg"></p>
+  </div>
+  <script>
+    const form = document.getElementById('form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn');
+      btn.disabled = true; btn.textContent = 'Création du paiement...';
+      document.getElementById('msg').textContent = '';
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (json.url) {
+        window.location.href = json.url; // page de paiement FedaPay (choix MTN/Moov)
+      } else {
+        document.getElementById('msg').textContent = json.error || 'Erreur';
+        btn.disabled = false; btn.textContent = 'Payer avec MTN ou Moov';
+      }
+    });
+  </script>
 </body>
 </html>
