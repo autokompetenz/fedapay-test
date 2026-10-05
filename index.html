@@ -16,6 +16,10 @@
     .methods { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .methods span { border: 1px solid #eee; padding: 8px 12px; border-radius: 8px; font-size: .85rem; }
     #msg { margin-top: 16px; color: #b91c1c; word-break: break-word; }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:10; align-items:center; justify-content:center; padding:20px; }
+    .modal.show { display:flex; }
+    .modal-box { background:#fff; border-radius:14px; padding:28px 24px; max-width:360px; width:100%; text-align:center; font-size:1.05rem; box-shadow:0 20px 50px rgba(0,0,0,.25); }
+    .modal-box button { margin-top:18px; padding:12px; background:#111; }
     @media (max-width: 480px) {
       .card { padding: 20px; border-radius: 12px; }
       h1 { font-size: 1.15rem; }
@@ -50,7 +54,17 @@
     </form>
     <p id="msg"></p>
   </div>
+  <div id="modal" class="modal">
+    <div class="modal-box">
+      <p id="modalText"></p>
+      <button id="modalClose" type="button">OK</button>
+    </div>
+  </div>
   <script>
+    const modal = document.getElementById('modal');
+    const modalText = document.getElementById('modalText');
+    document.getElementById('modalClose').onclick = () => modal.classList.remove('show');
+    function showModal(text) { modalText.textContent = text; modal.classList.add('show'); }
     const form = document.getElementById('form');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -67,18 +81,15 @@
       if (json.url) {
         window.location.href = json.url; // page de paiement FedaPay
       } else if (json.message) {
-        const msg = document.getElementById('msg');
-        msg.style.color = '#16a34a';
-        msg.textContent = json.message;
+        showModal(json.message);
         // Surveille le statut et affiche un message clair au client
         if (json.transactionId) {
           const poll = setInterval(async () => {
             try {
               const s = await (await fetch(`/api/status?id=${json.transactionId}`)).json();
-              msg.textContent = s.message;
+              modalText.textContent = s.message;
               if (s.status === 'approved' || s.status === 'canceled' || s.status === 'declined' || s.status === 'transferred') {
                 clearInterval(poll);
-                msg.style.color = s.status === 'approved' ? '#16a34a' : '#b91c1c';
                 btn.disabled = false; btn.textContent = 'Payer';
               }
             } catch {}
@@ -86,7 +97,7 @@
           setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = 'Payer'; }, 90000);
         }
       } else {
-        document.getElementById('msg').textContent = json.error || 'Erreur';
+        showModal(json.error || 'Erreur');
         btn.disabled = false; btn.textContent = 'Payer';
       }
     });
