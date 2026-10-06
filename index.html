@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Envoyer de l'argent à Marlet Djenontin</title>
+  <title>Collecte de fonds pour Marlet Djenontin</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: system-ui, sans-serif; background: #f5f7fa; margin: 0; padding: 20px 16px; }
@@ -13,27 +13,45 @@
     input, select { width: 100%; padding: 14px; margin: 6px 0 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
     button { width: 100%; padding: 16px; background: #16a34a; color: #fff; border: none; border-radius: 8px; font-size: 1.05rem; cursor: pointer; }
     button:disabled { opacity: .6; }
-    .methods { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .methods span { border: 1px solid #eee; padding: 8px 12px; border-radius: 8px; font-size: .85rem; }
-    #msg { margin-top: 16px; color: #b91c1c; word-break: break-word; }
+    .hidden { display: none; }
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:10; align-items:center; justify-content:center; padding:20px; }
     .modal.show { display:flex; }
-    .modal-box { background:#fff; border-radius:14px; padding:28px 24px; max-width:360px; width:100%; text-align:center; font-size:1.05rem; box-shadow:0 20px 50px rgba(0,0,0,.25); }
-    .modal-box button { margin-top:18px; padding:12px; background:#111; }
-    @media (max-width: 480px) {
-      .card { padding: 20px; border-radius: 12px; }
-      h1 { font-size: 1.15rem; }
-    }
+    .modal-box { background:#fff; border-radius:14px; padding:28px 24px; max-width:380px; width:100%; text-align:center; font-size:1.05rem; box-shadow:0 20px 50px rgba(0,0,0,.25); }
+    .choice-btn { background:#111; margin-bottom:12px; }
+    .paypal-btn { background:#003087; }
+    #msg { margin-top:16px; color:#b91c1c; }
+    @media (max-width: 480px) { .card { padding:20px; border-radius:12px; } h1 { font-size:1.15rem; } }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>💸 Envoyer de l'argent à <strong>Marlet Djenontin</strong></h1>
-    <p>Collecte de fonds pour son projet. Paiement via <strong>MTN Mobile Money</strong> ou <strong>Moov Money</strong>.</p>
-    <div class="methods">
-      <span>📱 MTN MoMo</span><span>📱 Moov Money</span>
+
+  <!-- Modale d'introduction -->
+  <div id="intro" class="modal show">
+    <div class="modal-box">
+      <h1>💸 Marlet Djenontin</h1>
+      <p>Ceci est un site de paiement pour soutenir <strong>Marlet Djenontin</strong> dans une collecte de fonds pour son projet.</p>
+      <button id="startBtn" type="button">Contribuer</button>
     </div>
-    <form id="form">
+  </div>
+
+  <!-- Modale choix du mode de paiement -->
+  <div id="choice" class="modal">
+    <div class="modal-box">
+      <h1>Comment veux-tu payer ?</h1>
+      <button class="choice-btn" id="chooseMM" type="button">📱 Mobile Money (MTN / Moov)</button>
+      <button class="choice-btn" id="chooseCard" type="button">💳 Carte bancaire / PayPal</button>
+    </div>
+  </div>
+
+  <!-- Modale statut -->
+  <div id="modal" class="modal">
+    <div class="modal-box"><p id="modalText"></p></div>
+  </div>
+
+  <!-- Page paiement Mobile Money -->
+  <div id="pageMM" class="card hidden">
+    <h1>📱 Paiement Mobile Money</h1>
+    <form id="formMM">
       <label>Montant (XOF)</label>
       <input name="amount" type="number" min="100" placeholder="Ex: 5000" required>
       <label>Prénom</label>
@@ -44,77 +62,83 @@
       <input name="email" type="email" placeholder="ton@email.com" required>
       <label>Téléphone (numéro Mobile Money)</label>
       <input name="phone" type="tel" placeholder="01XXXXXXXX" pattern="01[0-9]{8}" required>
-      <label>Mode de paiement</label>
-      <select name="mode" id="modeSelect">
+      <label>Opérateur</label>
+      <select name="mode">
         <option value="mtn">MTN Mobile Money</option>
         <option value="moov">Moov Money</option>
-        <option value="paypal">PayPal</option>
-        <option value="">Autres méthodes (page FedaPay)</option>
       </select>
-      <button id="btn" type="submit">Payer</button>
+      <button type="submit" id="btnMM">Payer</button>
     </form>
-    <p id="msg"></p>
   </div>
-  <div id="paypal-container-3RV4LYG8ELUB4" style="display:none;margin-top:20px;"></div>
+
+  <!-- Page paiement Carte / PayPal -->
+  <div id="pageCard" class="card hidden">
+    <h1>💳 Paiement par carte ou PayPal</h1>
+    <form id="formCard">
+      <label>Montant (XOF)</label>
+      <input name="amount" type="number" min="100" placeholder="Ex: 5000" required>
+      <label>Prénom</label>
+      <input name="firstname" placeholder="Ton prénom" required>
+      <label>Nom</label>
+      <input name="lastname" placeholder="Ton nom" required>
+      <label>Email</label>
+      <input name="email" type="email" placeholder="ton@email.com" required>
+      <button type="submit" id="btnCard">Payer par carte</button>
+    </form>
+    <p style="text-align:center;color:#888">ou</p>
+    <div id="paypal-container-3RV4LYG8ELUB4"></div>
+  </div>
+
   <script src="https://www.paypal.com/sdk/js?client-id=BAA9Yv_P7qCTFB3W2igMS5gzstYeREuywMqJbjqxOwb4HkUCFSJ-74-ptINbeRsiZTYnoiQtWUQnw9zeCc&components=hosted-buttons&disable-funding=venmo&currency=USD" crossorigin="anonymous" async></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (window.paypal) {
-        paypal.HostedButtons({ hostedButtonId: "3RV4LYG8ELUB4" }).render("#paypal-container-3RV4LYG8ELUB4");
-      } else {
-        window.addEventListener('load', () => paypal.HostedButtons({ hostedButtonId: "3RV4LYG8ELUB4" }).render("#paypal-container-3RV4LYG8ELUB4"));
-      }
-    });
-    document.getElementById('modeSelect').addEventListener('change', (e) => {
-      document.getElementById('paypal-container-3RV4LYG8ELUB4').style.display = e.target.value === 'paypal' ? 'block' : 'none';
-    });
-  </script>
-  <div id="modal" class="modal">
-    <div class="modal-box">
-      <p id="modalText"></p>
-    </div>
-  </div>
   <script>
     const modal = document.getElementById('modal');
     const modalText = document.getElementById('modalText');
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
     function showModal(text) { modalText.textContent = text; modal.classList.add('show'); }
-    const form = document.getElementById('form');
-    form.addEventListener('submit', async (e) => {
+
+    document.getElementById('startBtn').onclick = () => {
+      document.getElementById('intro').classList.remove('show');
+      document.getElementById('choice').classList.add('show');
+    };
+    document.getElementById('chooseMM').onclick = () => {
+      document.getElementById('choice').classList.remove('show');
+      document.getElementById('pageMM').classList.remove('hidden');
+    };
+    document.getElementById('chooseCard').onclick = () => {
+      document.getElementById('choice').classList.remove('show');
+      document.getElementById('pageCard').classList.remove('hidden');
+    };
+
+    // PayPal hosted button
+    window.addEventListener('load', () => {
+      const render = () => paypal.HostedButtons({ hostedButtonId: "3RV4LYG8ELUB4" }).render("#paypal-container-3RV4LYG8ELUB4");
+      if (window.paypal) render(); else setTimeout(render, 1500);
+    });
+
+    // Mobile Money
+    document.getElementById('formMM').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('btn');
+      const btn = document.getElementById('btnMM');
       btn.disabled = true; btn.textContent = 'Création du paiement...';
-      document.getElementById('msg').textContent = '';
-      const data = Object.fromEntries(new FormData(form));
-      if (data.mode === 'paypal') {
-        document.getElementById('paypal-container-3RV4LYG8ELUB4').style.display = 'block';
-        btn.disabled = false; btn.textContent = 'Payer';
-        return;
-      }
+      const data = Object.fromEntries(new FormData(e.target));
       if (!/^01\d{8}$/.test(data.phone.replace(/\s/g, ''))) {
         showModal('❌ Le numéro doit commencer par 01 et contenir 10 chiffres.');
         btn.disabled = false; btn.textContent = 'Payer';
         return;
       }
       const res = await fetch('/api/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
       });
       const json = await res.json();
-      if (json.url) {
-        window.location.href = json.url; // page de paiement FedaPay
-      } else if (json.message) {
+      if (json.message) {
         showModal(json.message);
-        // Surveille le statut et affiche un message clair au client
         if (json.transactionId) {
           const poll = setInterval(async () => {
             try {
               const s = await (await fetch(`/api/status?id=${json.transactionId}`)).json();
               modalText.textContent = s.message;
-              if (s.status === 'approved' || s.status === 'canceled' || s.status === 'declined' || s.status === 'transferred') {
-                clearInterval(poll);
-                btn.disabled = false; btn.textContent = 'Payer';
+              if (['approved','canceled','declined','transferred'].includes(s.status)) {
+                clearInterval(poll); btn.disabled = false; btn.textContent = 'Payer';
               }
             } catch {}
           }, 4000);
@@ -124,6 +148,22 @@
         showModal(json.error || 'Erreur');
         btn.disabled = false; btn.textContent = 'Payer';
       }
+    });
+
+    // Carte bancaire via FedaPay checkout
+    document.getElementById('formCard').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnCard');
+      btn.disabled = true; btn.textContent = 'Création du paiement...';
+      const data = Object.fromEntries(new FormData(e.target));
+      data.mode = ''; // page FedaPay (cartes)
+      data.phone = '00000000';
+      const res = await fetch('/api/create-payment', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (json.url) window.location.href = json.url;
+      else { showModal(json.error || 'Erreur'); btn.disabled = false; btn.textContent = 'Payer par carte'; }
     });
   </script>
 </body>
