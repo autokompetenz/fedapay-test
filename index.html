@@ -73,19 +73,8 @@
 
   <!-- Page paiement Carte / PayPal -->
   <div id="pageCard" class="card hidden">
-    <h1>💳 Paiement par carte ou PayPal</h1>
-    <form id="formCard">
-      <label>Montant (XOF)</label>
-      <input name="amount" type="number" min="100" placeholder="Ex: 5000" required>
-      <label>Prénom</label>
-      <input name="firstname" placeholder="Ton prénom" required>
-      <label>Nom</label>
-      <input name="lastname" placeholder="Ton nom" required>
-      <label>Email</label>
-      <input name="email" type="email" placeholder="ton@email.com" required>
-      <button type="submit" id="btnCard">Payer par carte</button>
-    </form>
-    <p style="text-align:center;color:#888">ou</p>
+    <h1>💳 Paiement via PayPal</h1>
+    <p>Clique sur le bouton PayPal pour finaliser ton don.</p>
     <div id="paypal-container-3RV4LYG8ELUB4"></div>
   </div>
 
@@ -150,21 +139,6 @@
       }
     });
 
-    // Carte bancaire via FedaPay checkout
-    document.getElementById('formCard').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btnCard');
-      btn.disabled = true; btn.textContent = 'Création du paiement...';
-      const data = Object.fromEntries(new FormData(e.target));
-      data.mode = ''; // page FedaPay (cartes)
-      data.phone = '00000000';
-      const res = await fetch('/api/create-payment', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (json.url) window.location.href = json.url;
-      else { showModal(json.error || 'Erreur'); btn.disabled = false; btn.textContent = 'Payer par carte'; }
-    });
   </script>
 </body>
 </html>
