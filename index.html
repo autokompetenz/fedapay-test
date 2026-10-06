@@ -45,15 +45,30 @@
       <label>Téléphone (numéro Mobile Money)</label>
       <input name="phone" type="tel" placeholder="01XXXXXXXX" pattern="01[0-9]{8}" required>
       <label>Mode de paiement</label>
-      <select name="mode">
+      <select name="mode" id="modeSelect">
         <option value="mtn">MTN Mobile Money</option>
         <option value="moov">Moov Money</option>
+        <option value="paypal">PayPal</option>
         <option value="">Autres méthodes (page FedaPay)</option>
       </select>
       <button id="btn" type="submit">Payer</button>
     </form>
     <p id="msg"></p>
   </div>
+  <div id="paypal-container-3RV4LYG8ELUB4" style="display:none;margin-top:20px;"></div>
+  <script src="https://www.paypal.com/sdk/js?client-id=BAA9Yv_P7qCTFB3W2igMS5gzstYeREuywMqJbjqxOwb4HkUCFSJ-74-ptINbeRsiZTYnoiQtWUQnw9zeCc&components=hosted-buttons&disable-funding=venmo&currency=USD" crossorigin="anonymous" async></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.paypal) {
+        paypal.HostedButtons({ hostedButtonId: "3RV4LYG8ELUB4" }).render("#paypal-container-3RV4LYG8ELUB4");
+      } else {
+        window.addEventListener('load', () => paypal.HostedButtons({ hostedButtonId: "3RV4LYG8ELUB4" }).render("#paypal-container-3RV4LYG8ELUB4"));
+      }
+    });
+    document.getElementById('modeSelect').addEventListener('change', (e) => {
+      document.getElementById('paypal-container-3RV4LYG8ELUB4').style.display = e.target.value === 'paypal' ? 'block' : 'none';
+    });
+  </script>
   <div id="modal" class="modal">
     <div class="modal-box">
       <p id="modalText"></p>
@@ -71,6 +86,11 @@
       btn.disabled = true; btn.textContent = 'Création du paiement...';
       document.getElementById('msg').textContent = '';
       const data = Object.fromEntries(new FormData(form));
+      if (data.mode === 'paypal') {
+        document.getElementById('paypal-container-3RV4LYG8ELUB4').style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Payer';
+        return;
+      }
       if (!/^01\d{8}$/.test(data.phone.replace(/\s/g, ''))) {
         showModal('❌ Le numéro doit commencer par 01 et contenir 10 chiffres.');
         btn.disabled = false; btn.textContent = 'Payer';
