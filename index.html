@@ -43,7 +43,7 @@
       <label>Email</label>
       <input name="email" type="email" placeholder="ton@email.com" required>
       <label>Téléphone (numéro Mobile Money)</label>
-      <input name="phone" type="tel" placeholder="97XXXXXX" required>
+      <input name="phone" type="tel" placeholder="01XXXXXXXX" pattern="01[0-9]{8}" required>
       <label>Mode de paiement</label>
       <select name="mode">
         <option value="mtn">MTN Mobile Money</option>
@@ -71,6 +71,11 @@
       btn.disabled = true; btn.textContent = 'Création du paiement...';
       document.getElementById('msg').textContent = '';
       const data = Object.fromEntries(new FormData(form));
+      if (!/^01\d{8}$/.test(data.phone.replace(/\s/g, ''))) {
+        showModal('❌ Le numéro doit commencer par 01 et contenir 10 chiffres.');
+        btn.disabled = false; btn.textContent = 'Payer';
+        return;
+      }
       const res = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
