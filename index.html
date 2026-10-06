@@ -6,21 +6,41 @@
   <title>Collecte de fonds pour Marlet Djenontin</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; background: #f5f7fa; margin: 0; padding: 20px 16px; }
-    .card { background: #fff; max-width: 480px; margin: auto; padding: 24px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-    h1 { margin-top: 0; font-size: 1.3rem; }
-    label { font-size: .85rem; color: #555; }
-    input, select { width: 100%; padding: 14px; margin: 6px 0 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-    button { width: 100%; padding: 16px; background: #16a34a; color: #fff; border: none; border-radius: 8px; font-size: 1.05rem; cursor: pointer; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      margin: 0; padding: 20px 16px; min-height: 100vh;
+    }
+    .card {
+      background: #fff; max-width: 480px; margin: auto; padding: 28px;
+      border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    h1 { margin-top: 0; font-size: 1.35rem; color: #0f2027; }
+    label { font-size: .85rem; color: #666; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 14px; margin: 6px 0 16px;
+      border: 2px solid #e5e9f0; border-radius: 10px; font-size: 1rem;
+      transition: border-color .2s;
+    }
+    input:focus, select:focus { outline: none; border-color: #2c5364; }
+    button {
+      width: 100%; padding: 16px; background: linear-gradient(90deg, #11998e, #38ef7d);
+      color: #fff; border: none; border-radius: 10px; font-size: 1.05rem;
+      font-weight: bold; cursor: pointer; transition: transform .1s;
+    }
+    button:active { transform: scale(.98); }
     button:disabled { opacity: .6; }
     .hidden { display: none; }
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:10; align-items:center; justify-content:center; padding:20px; }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:10; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(4px); }
     .modal.show { display:flex; }
-    .modal-box { background:#fff; border-radius:14px; padding:28px 24px; max-width:380px; width:100%; text-align:center; font-size:1.05rem; box-shadow:0 20px 50px rgba(0,0,0,.25); }
-    .choice-btn { background:#111; margin-bottom:12px; }
-    .paypal-btn { background:#003087; }
+    .modal-box {
+      background:#fff; border-radius:16px; padding:32px 26px; max-width:400px; width:100%;
+      text-align:center; font-size:1.05rem; line-height:1.6;
+      box-shadow:0 25px 70px rgba(0,0,0,.4);
+    }
+    .choice-btn { background:#203a43; margin-bottom:12px; }
     #msg { margin-top:16px; color:#b91c1c; }
-    @media (max-width: 480px) { .card { padding:20px; border-radius:12px; } h1 { font-size:1.15rem; } }
+    @media (max-width: 480px) { .card { padding:20px; border-radius:14px; } h1 { font-size:1.15rem; } }
   </style>
 </head>
 <body>
