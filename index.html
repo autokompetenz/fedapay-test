@@ -73,12 +73,13 @@
 
   <!-- Page paiement Carte / PayPal -->
   <div id="pageCard" class="card hidden">
-    <h1>💳 Paiement via PayPal</h1>
-    <p>Clique sur le bouton PayPal pour finaliser ton don.</p>
-    <div id="paypal-container-3RV4LYG8ELUB4"></div>
+    <h1>💛 Paiement via PayPal</h1>
+    <p>Clique sur le bouton pour finaliser ton don en toute sécurité.</p>
+    <a href="https://www.paypal.com/ncp/payment/3RV4LYG8ELUB4" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;">
+      <button type="button" style="background:#ffc439;color:#111;font-weight:bold;">Payer avec PayPal</button>
+    </a>
   </div>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=BAA9Yv_P7qCTFB3W2igMS5gzstYeREuywMqJbjqxOwb4HkUCFSJ-74-ptINbeRsiZTYnoiQtWUQnw9zeCc&components=hosted-buttons&disable-funding=venmo&currency=USD" crossorigin="anonymous" async></script>
   <script>
     const modal = document.getElementById('modal');
     const modalText = document.getElementById('modalText');
@@ -98,11 +99,6 @@
       document.getElementById('pageCard').classList.remove('hidden');
     };
 
-    // PayPal hosted button
-    window.addEventListener('load', () => {
-      const render = () => paypal.HostedButtons({ hostedButtonId: "3RV4LYG8ELUB4" }).render("#paypal-container-3RV4LYG8ELUB4");
-      if (window.paypal) render(); else setTimeout(render, 1500);
-    });
 
     // Mobile Money
     document.getElementById('formMM').addEventListener('submit', async (e) => {
