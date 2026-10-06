@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         description: `Collecte pour Marlet Djenontin - ${amount} XOF`,
         amount: Number(amount),
         currency: { iso: 'XOF' },
-        callback_url: 'https://fedapay-test.vercel.app/api/webhook',
+        callback_url: 'https://collecte-marlet.vercel.app/api/webhook',
         customer: {
           firstname: firstname || 'Client',
           lastname: lastname || 'Test',
